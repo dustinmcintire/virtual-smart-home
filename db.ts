@@ -162,7 +162,7 @@ export async function getUserRecord(
 
   data.isBlocked = !data.isBlocked ? false : true
 
-  data.plan = data.plan ?? PlanName.FREE
+  data.plan = data.plan ?? PlanName.PRO
 
   if (!data.allowedDeviceCount) {
     const plan = new Plan(data.plan as PlanName)
