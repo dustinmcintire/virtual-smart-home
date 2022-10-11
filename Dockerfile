@@ -7,8 +7,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN mkdir /data
 WORKDIR /data
 RUN git clone https://github.com/dustinmcintire/virtual-smart-home.git
-RUN git checkout --track origin/sandbox
 WORKDIR /data/virtual-smart-home
+RUN git checkout --track origin/sandbox
 RUN npm install
 RUN npm install -g serverless
 
