@@ -16,9 +16,9 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 RUN useradd -m vsh
 
 # Force update of cloudformation from eu-west-1
-COPY env.sh /.env
+COPY env.sh /data/virtual-smart-home/.env
 COPY docker-entrypoint.sh /
 
-ENTRYPOINT ["/docker-entrypoint.sh", "virtual-smart-home"]
+#ENTRYPOINT ["/docker-entrypoint.sh", "virtual-smart-home"]
 
-CMD ["serverless deploy"]
+CMD ["export $(grep -v '^#' .env | xargs) && serverless deploy"]
