@@ -15,9 +15,7 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 RUN useradd -m vsh
 
 # Force update of cloudformation from eu-west-1
-RUN cp cloudFormation-eu-west-1.yml cloudFormation-us-west-2.yml
 COPY env.sh /.env
-COPY serverless.yml /data/virtual-smart-home/serverless.yml
 COPY docker-entrypoint.sh /
 
 ENTRYPOINT ["/docker-entrypoint.sh", "virtual-smart-home"]
