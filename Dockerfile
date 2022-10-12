@@ -6,9 +6,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git
 RUN mkdir /data
 WORKDIR /data
-RUN git clone https://github.com/dustinmcintire/virtual-smart-home.git
+#RUN git clone https://github.com/dustinmcintire/virtual-smart-home.git
+RUN git clone https://github.com/csuermann/virtual-smart-home.git
 WORKDIR /data/virtual-smart-home
 RUN git checkout --track origin/sandbox
+RUN cp cloudFormation-eu-west-1.yml cloudFormation-us-west-2.yml
 RUN npm install
 RUN npm install -g serverless
 
@@ -21,4 +23,4 @@ COPY docker-entrypoint.sh /
 
 #ENTRYPOINT ["/docker-entrypoint.sh", "virtual-smart-home"]
 
-CMD ["export $(grep -v '^#' .env | xargs) && serverless deploy"]
+CMD ["/bin/bash", "-c", "export $(grep -v '^#' .env | xargs) && serverless deploy"]
