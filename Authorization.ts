@@ -1,4 +1,5 @@
 import Axios, { AxiosResponse } from 'axios'
+import * as log from 'log'
 
 export interface AccessTokenResponse {
   access_token: string

@@ -37,6 +37,8 @@ export function upsertTokens(
     UpdateExpression = UpdateExpression + ', skillRegion = :sr'
     ExpressionAttributeValues[':sr'] = skillRegion
   }
+  console.log(UpdateExpression)
+  console.log(ExpressionAttributeValues)
 
   let params = {
     TableName: 'VSH',
