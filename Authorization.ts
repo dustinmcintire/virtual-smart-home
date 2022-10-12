@@ -35,10 +35,10 @@ export async function fetchAccessAndRefreshToken(
     },
   })
 
-  console.log(':::fetchAccessAndRefreshToken:::')
-  console.log(url)
-  console.log(data)
-  console.log(response.data)
+  log.debug(':::fetchAccessAndRefreshToken:::')
+  log.debug('url: %j', url)
+  log.debug('data: %j', data)
+  log.debug('response: %j', response.data)
 
   // {
   //   "access_token":"Atza|IQEBLjAsAhRmHjNmHpi0U-Dme37rR6CuUpSR...",
@@ -63,8 +63,8 @@ export async function fetchFreshAccessToken(
     }
   )
 
-  console.log(':::fetchFreshAccessToken:::')
-  console.log(response.data)
+  log.debug(':::fetchFreshAccessToken:::')
+  log.debug('response: %j', response.data)
   // {
   //   "access_token":"Atza|IQEBLjAsAhRmHjNmHpi0U-Dme37rR6CuUpSR...",
   //   "token_type":"bearer",

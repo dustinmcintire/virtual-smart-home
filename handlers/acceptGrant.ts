@@ -1,9 +1,11 @@
 import { fetchAccessAndRefreshToken } from '../Authorization'
 import { upsertTokens } from '../db'
+import * as log from 'log'
 
 export default async function handleAcceptGrant (event) {
   try {
     const tokenData = await fetchAccessAndRefreshToken(event)
+    log.debug('tokenData: %j', tokenData)
 
     await upsertTokens(
       {
@@ -15,6 +17,7 @@ export default async function handleAcceptGrant (event) {
       },
       tokenData.expires_in
     )
+    log.debug('upsert complete')
 
     return {
       event: {

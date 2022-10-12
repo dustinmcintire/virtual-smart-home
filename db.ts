@@ -7,6 +7,7 @@ import {
 } from './Authorization'
 import { Device } from './Device'
 import { Plan, PlanName } from './Plan'
+import * as log from 'log'
 
 AWS.config.update({ region: process.env.VSH_IOT_REGION })
 
@@ -37,8 +38,6 @@ export function upsertTokens(
     UpdateExpression = UpdateExpression + ', skillRegion = :sr'
     ExpressionAttributeValues[':sr'] = skillRegion
   }
-  console.log(UpdateExpression)
-  console.log(ExpressionAttributeValues)
 
   let params = {
     TableName: 'VSH',
@@ -49,10 +48,12 @@ export function upsertTokens(
     UpdateExpression,
     ExpressionAttributeValues,
   }
+  log.debug('params: %j', params)
 
   return new Promise((resolve, reject) => {
     docClient.update(params, function (err, data) {
       if (err) {
+        log.error('docClient update failed')
         return reject(err)
       } else {
         return resolve(data)
