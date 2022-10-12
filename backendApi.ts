@@ -224,10 +224,13 @@ app.post('/provision', async function (req, res) {
 
   try {
     const profile = await fetchProfile(req.body.accessToken)
+    log.error('fetchProfile OK')
 
     const { isBlocked } = await getUserRecord(profile.user_id)
+    log.error('getUserRecord OK')
 
     if (isBlocked) {
+      log.error('User is blocked')
       throw new Error(
         `found attribute 'isBlocked' for userId ${profile.user_id} / ${profile.email}`
       )
@@ -245,12 +248,16 @@ app.post('/provision', async function (req, res) {
       publicKey,
       privateKey,
     } = await createKeysAndCertificate()
+    log.error('createKeyAndCertificate OK')
 
     await attachPremadePolicyToCertificate(certificateArn)
+    log.error('attachPremadePolicyToCertificate OK')
 
     await attachCertificateToThing(certificateArn, thingName)
+    log.error('attachCertificateToThing OK')
 
     await addThingToThingGroup(thingName, 'virtual-smart-home-things')
+    log.error('addThingToThingGroup OK')
 
     const vshJwt = jwt.sign(
       {
@@ -260,6 +267,7 @@ app.post('/provision', async function (req, res) {
       },
       process.env.HASH_SECRET
     )
+    log.error('jwt.sign OK')
 
     const response = {
       server: process.env.VSH_IOT_ENDPOINT, //'a1pv0eq8s016ut-ats.iot.eu-west-1.amazonaws.com'
