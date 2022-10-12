@@ -4,6 +4,7 @@ import * as log from 'log'
 
 export default async function handleAcceptGrant (event) {
   try {
+    log.debug('handleAcceptGrant start')
     const tokenData = await fetchAccessAndRefreshToken(event)
     log.debug('tokenData: %j', tokenData)
 
