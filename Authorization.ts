@@ -29,15 +29,16 @@ export async function fetchAccessAndRefreshToken(
 ): Promise<AccessTokenResponse> {
   const data = `grant_type=authorization_code&code=${event.directive.payload.grant.code}&client_id=${process.env.ALEXA_CLIENT_ID}&client_secret=${process.env.ALEXA_CLIENT_SECRET}`
   const url = 'https://api.amazon.com/auth/o2/token'
+  log.debug(':::fetchAccessAndRefreshToken:::')
+  log.debug('url: %j', url)
+  log.debug('data: %j', data)
   const response: AxiosResponse = await Axios.post(url, data, {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
   })
 
-  log.debug(':::fetchAccessAndRefreshToken:::')
-  log.debug('url: %j', url)
-  log.debug('data: %j', data)
+
   log.debug('response: %j', response.data)
 
   // {
