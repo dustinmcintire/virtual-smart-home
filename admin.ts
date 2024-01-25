@@ -2,8 +2,11 @@ import * as serverless from 'serverless-http'
 import * as express from 'express'
 import * as logger from 'log-aws-lambda'
 import AWS = require('aws-sdk')
-import { getDevicesOfUser, getUserRecord } from './db'
+import { getDevicesOfUser, getThingsOfUser, getUserRecord } from './db'
 import { proactivelyRediscoverAllDevices } from './helper'
+import { publish } from './mqtt'
+import { switchToPlan } from './subscription'
+import { PlanName } from './Plan'
 
 logger()
 
@@ -201,6 +204,7 @@ app.get('/thing/:thingName/info', async function (req, res) {
     shadow: makeTimestampsReadable(thingShadow),
     account: {
       ...account,
+      userId: thingDetails.attributes['userId'],
       SK: undefined,
       PK: undefined,
       accessToken: undefined,
@@ -275,6 +279,95 @@ app.post('/thing/:thingName/rediscover', async function (req, res) {
     console.log(err)
     res.status(500).send(err.message)
   }
+})
+
+app.post('/thing/:thingName/restart', async function (req, res) {
+  try {
+    await publish(`vsh/${req.params.thingName}/service`, {
+      operation: 'restart',
+    })
+
+    res.send({ result: 'ok' })
+  } catch (err) {
+    console.log(err)
+    res.status(500).send(err.message)
+  }
+})
+
+app.post('/thing/:thingName/kill', async function (req, res) {
+  try {
+    await publish(`vsh/${req.params.thingName}/service`, {
+      operation: 'kill',
+      reason: req.query.reason ?? 'killed by admin',
+    })
+
+    res.send({ result: 'ok' })
+  } catch (err) {
+    console.log(err)
+    res.status(500).send(err.message)
+  }
+})
+
+app.get('/user/:userId/info', async function (req, res) {
+  try {
+    const userRecord = await getUserRecord(req.params.userId)
+    const account = {
+      ...userRecord,
+      userId: req.params.userId,
+      SK: undefined,
+      PK: undefined,
+      accessToken: undefined,
+      refreshToken: undefined,
+      deleteAtUnixTime: new Date(
+        userRecord.deleteAtUnixTime * 1000
+      ).toISOString(),
+    }
+
+    const devices = (await getDevicesOfUser(req.params.userId)).reduce(
+      (acc, device) => {
+        const key = device.thingId
+        if (!acc[key]) {
+          acc[key] = []
+        }
+        acc[key].push({
+          ...device,
+          SK: undefined,
+          PK: undefined,
+          thingId: undefined,
+        })
+        return acc
+      },
+      {}
+    )
+
+    res.send({
+      account,
+      devices,
+    })
+  } catch (err) {
+    console.log(err)
+    res.status(500).send(err.message)
+  }
+})
+
+app.post('/user/:userId/restartThings', async function (req, res) {
+  try {
+    const thingIds = await getThingsOfUser(req.params.userId)
+    for (const thingId of thingIds) {
+      await publish(`vsh/${thingId}/service`, {
+        operation: 'restart',
+      })
+    }
+    res.send({ result: 'ok', thingIds })
+  } catch (err) {
+    console.log(err)
+    res.status(500).send(err.message)
+  }
+})
+
+app.post('/user/:userId/switchToPlan/:planName', async function (req, res) {
+  await switchToPlan(req.params.userId, req.params.planName as PlanName)
+  res.send({ result: 'ok' })
 })
 
 app.post('/thing/:thingName/blockUser', async function (req, res) {
